@@ -147,7 +147,7 @@ func (c *Client) autoRefreshLoop(ctx context.Context) {
 		c.mu.Unlock()
 
 		if wait < 0 {
-			wait = 10 * time.Second
+			wait = 2 * time.Second
 		}
 
 		select {
