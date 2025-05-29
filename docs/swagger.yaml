@@ -1,0 +1,187 @@
+definitions:
+  domain.Balance:
+    properties:
+      asset:
+        type: string
+      free:
+        type: number
+      locked:
+        type: number
+    type: object
+  domain.DepthLevel:
+    properties:
+      price:
+        type: number
+      quantity:
+        type: number
+    type: object
+  domain.OrderBook:
+    properties:
+      asks:
+        items:
+          $ref: '#/definitions/domain.DepthLevel'
+        type: array
+      bids:
+        items:
+          $ref: '#/definitions/domain.DepthLevel'
+        type: array
+      symbol:
+        type: string
+    type: object
+  domain.OrderRequest:
+    properties:
+      clientID:
+        type: string
+      price:
+        type: number
+      quantity:
+        type: number
+      side:
+        $ref: '#/definitions/domain.OrderSide'
+      symbol:
+        type: string
+      timestamp:
+        type: string
+      type:
+        $ref: '#/definitions/domain.OrderType'
+    type: object
+  domain.OrderResponse:
+    properties:
+      id:
+        type: string
+      price:
+        type: number
+      quantity:
+        type: number
+      side:
+        $ref: '#/definitions/domain.OrderSide'
+      status:
+        type: string
+      symbol:
+        type: string
+      timestamp:
+        type: string
+      type:
+        $ref: '#/definitions/domain.OrderType'
+    type: object
+  domain.OrderSide:
+    enum:
+    - BUY
+    - SELL
+    type: string
+    x-enum-varnames:
+    - SideBuy
+    - SideSell
+  domain.OrderType:
+    enum:
+    - MARKET
+    - LIMIT
+    type: string
+    x-enum-varnames:
+    - TypeMarket
+    - TypeLimit
+  transport.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /v1/balance:
+    get:
+      description: Retrieve all asset balances of the account
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Balance'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/transport.ErrorResponse'
+      summary: Get account balances
+      tags:
+      - balance
+  /v1/book/{symbol}:
+    get:
+      description: Fetch the current order book for a trading symbol
+      parameters:
+      - description: Trading symbol
+        in: path
+        name: symbol
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.OrderBook'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/transport.ErrorResponse'
+      summary: Get order book
+      tags:
+      - market
+  /v1/orders:
+    post:
+      consumes:
+      - application/json
+      description: Place a new order on the configured exchange
+      parameters:
+      - description: Order payload
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/domain.OrderRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.OrderResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/transport.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/transport.ErrorResponse'
+      summary: Create a new order
+      tags:
+      - orders
+  /v1/orders/{symbol}/{id}:
+    delete:
+      description: Cancel a placed order by symbol and ID
+      parameters:
+      - description: Trading symbol
+        in: path
+        name: symbol
+        required: true
+        type: string
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/transport.ErrorResponse'
+      summary: Cancel an existing order
+      tags:
+      - orders
+swagger: "2.0"

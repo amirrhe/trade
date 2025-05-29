@@ -1,3 +1,4 @@
+// internal/infrastructure/config/config.go
 package config
 
 import (
@@ -6,51 +7,57 @@ import (
 	"github.com/joho/godotenv"
 )
 
-type BinanceConfig struct {
+type BitpinConfig struct {
 	APIKey    string
 	APISecret string
 	BaseURL   string
 }
 
-type KuCoinConfig struct {
-	APIKey     string
-	APISecret  string
-	Passphrase string
-	BaseURL    string
+type WallexConfig struct {
+	APIKey  string
+	BaseURL string
 }
 
 type Config struct {
-	Exchange string
+	Exchange string // "bitpin", or "wallex"
 	HTTPPort string
-	Binance  BinanceConfig
-	KuCoin   KuCoinConfig
+	LogLevel string
+
+	Bitpin BitpinConfig
+	Wallex WallexConfig
 }
 
 func LoadConfig() (*Config, error) {
 	_ = godotenv.Load()
 
-	cfg := &Config{
-		Exchange: getEnv("EXCHANGE", "binance"),
+	return &Config{
+		Exchange: getEnv("EXCHANGE", "bitpin"),
 		HTTPPort: getEnv("HTTP_PORT", "8080"),
-		Binance: BinanceConfig{
-			APIKey:    getEnv("BINANCE_API_KEY", ""),
-			APISecret: getEnv("BINANCE_API_SECRET", ""),
-			BaseURL:   getEnv("BINANCE_BASE_URL", "https://api.binance.com"),
-		},
-		KuCoin: KuCoinConfig{
-			APIKey:     getEnv("KUCOIN_API_KEY", ""),
-			APISecret:  getEnv("KUCOIN_API_SECRET", ""),
-			Passphrase: getEnv("KUCOIN_PASSPHRASE", ""),
-			BaseURL:    getEnv("KUCOIN_BASE_URL", "https://api.kucoin.com"),
-		},
-	}
+		LogLevel: getEnv("LOG_LEVEL", "info"),
 
-	return cfg, nil
+		Bitpin: BitpinConfig{
+			APIKey:    mustGetEnv("BITPIN_API_KEY"),
+			APISecret: mustGetEnv("BITPIN_API_SECRET"),
+			BaseURL:   getEnv("BITPIN_BASE_URL", "https://api.bitpin.ir"),
+		},
+
+		Wallex: WallexConfig{
+			APIKey:  mustGetEnv("WALLEX_API_KEY"),
+			BaseURL: getEnv("WALLEX_BASE_URL", "https://api.wallex.ir"),
+		},
+	}, nil
 }
 
-func getEnv(key, defaultVal string) string {
+func getEnv(key, def string) string {
 	if v := os.Getenv(key); v != "" {
 		return v
 	}
-	return defaultVal
+	return def
+}
+
+func mustGetEnv(key string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	panic("environment variable " + key + " required")
 }
