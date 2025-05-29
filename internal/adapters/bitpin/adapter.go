@@ -1,4 +1,3 @@
-// internal/adapters/bitpin/adapter.go
 package bitpin
 
 import (

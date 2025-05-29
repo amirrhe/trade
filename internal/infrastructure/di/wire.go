@@ -1,4 +1,3 @@
-// internal/infrastructure/di/wire.go
 package di
 
 import (
@@ -16,7 +15,6 @@ import (
 )
 
 func BuildApp(cfg *config.Config) (*fiber.App, error) {
-	// 1) Logger
 	logPort, err := logger.NewLogrusAdapter(cfg.LogLevel)
 	if err != nil {
 		return nil, err
@@ -42,10 +40,8 @@ func BuildApp(cfg *config.Config) (*fiber.App, error) {
 		return nil, fmt.Errorf("unsupported exchange: %s", cfg.Exchange)
 	}
 
-	// 3) Core service
 	svc := application.NewTradingService(exch, logPort)
 
-	// 4) HTTP transport
 	app := transport.NewRouter(svc, logPort)
 	return app, nil
 }
