@@ -28,11 +28,13 @@ func NewAdapter(apiKey, baseURL string, log ports.LoggerPort) *WallexAdapter {
 
 func (w *WallexAdapter) CreateOrder(ctx context.Context, req domain.OrderRequest) (domain.OrderResponse, error) {
 	w.log.Info(ctx, "CreateOrder start", ports.Fields{
-		"symbol": req.Symbol, "side": req.Side, "type": req.Type, "quantity": req.Quantity,
+		"symbol":   req.Symbol,
+		"side":     req.Side,
+		"type":     req.Type,
+		"quantity": req.Quantity,
 	})
 	start := time.Now()
 
-	// build payload
 	payload := map[string]string{
 		"symbol":   req.Symbol,
 		"type":     string(req.Type),
@@ -46,8 +48,7 @@ func (w *WallexAdapter) CreateOrder(ctx context.Context, req domain.OrderRequest
 		payload["client_id"] = *req.ClientID
 	}
 	bodyBytes, _ := json.Marshal(payload)
-
-	w.log.Info(ctx, "CreateOrder payload", ports.Fields{"body": string(bodyBytes)})
+	w.log.Debug(ctx, "CreateOrder payload", ports.Fields{"body": string(bodyBytes)})
 
 	url := fmt.Sprintf("%s/v1/account/orders", w.client.baseURL)
 	httpReq, _ := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(bodyBytes))
@@ -60,9 +61,13 @@ func (w *WallexAdapter) CreateOrder(ctx context.Context, req domain.OrderRequest
 	defer resp.Body.Close()
 
 	data, _ := io.ReadAll(resp.Body)
-	w.log.Info(ctx, "CreateOrder response", ports.Fields{"status": resp.StatusCode, "body": string(data), "latency_ms": elapsed})
+	w.log.Debug(ctx, "CreateOrder response", ports.Fields{
+		"status":     resp.StatusCode,
+		"body":       string(data),
+		"latency_ms": elapsed,
+	})
 
-	if resp.StatusCode != http.StatusOK {
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
 		err := fmt.Errorf("status %d: %s", resp.StatusCode, data)
 		w.log.Error(ctx, "CreateOrder failed", ports.Fields{"error": err.Error(), "latency_ms": elapsed})
 		return domain.OrderResponse{}, err
@@ -75,10 +80,12 @@ func (w *WallexAdapter) CreateOrder(ctx context.Context, req domain.OrderRequest
 			Type          string `json:"type"`
 			Side          string `json:"side"`
 			Price         string `json:"price"`
+			OrigQty       string `json:"origQty"`
 			ExecutedQty   string `json:"executedQty"`
-			Status        string `json:"status"`
+			TransactTime  int64  `json:"transactTime"`
 			ClientOrderId string `json:"clientOrderId"`
-			CreatedAt     string `json:"created_at"`
+			Status        string `json:"status"`
+			Active        bool   `json:"active"`
 		} `json:"result"`
 	}
 	if err := json.Unmarshal(data, &wrap); err != nil {
@@ -86,22 +93,29 @@ func (w *WallexAdapter) CreateOrder(ctx context.Context, req domain.OrderRequest
 		return domain.OrderResponse{}, err
 	}
 
+	origQty, _ := strconv.ParseFloat(wrap.Result.OrigQty, 64)
 	exQty, _ := strconv.ParseFloat(wrap.Result.ExecutedQty, 64)
 	priceVal, _ := strconv.ParseFloat(wrap.Result.Price, 64)
-	ts, _ := time.Parse(time.RFC3339, wrap.Result.CreatedAt)
+	ts := time.Unix(wrap.Result.TransactTime, 0)
 
 	res := domain.OrderResponse{
 		ID:        wrap.Result.ClientOrderId,
 		Symbol:    wrap.Result.Symbol,
 		Side:      domain.OrderSide(wrap.Result.Side),
 		Type:      domain.OrderType(wrap.Result.Type),
-		Quantity:  exQty,
+		Quantity:  origQty,
 		Price:     priceVal,
 		Status:    wrap.Result.Status,
 		Timestamp: ts,
 	}
+
 	w.log.Info(ctx, "CreateOrder succeeded", ports.Fields{
-		"orderID": res.ID, "quantity": res.Quantity, "price": res.Price, "latency_ms": elapsed,
+		"orderID":     res.ID,
+		"origQty":     origQty,
+		"executedQty": exQty,
+		"price":       priceVal,
+		"active":      wrap.Result.Active,
+		"latency_ms":  elapsed,
 	})
 	return res, nil
 }
