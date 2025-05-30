@@ -10,7 +10,7 @@ It provides both an HTTP API (via Fiber) and a CLI entrypoint, and supports mult
 
 ## 📂 Project Structure
 
-```text
+```
 .
 ├── cmd
 │   └── http
@@ -45,12 +45,6 @@ It provides both an HTTP API (via Fiber) and a CLI entrypoint, and supports mult
   * `DELETE /v1/orders/:symbol/:id` → cancel order
   * `GET /v1/balance` → get account balances
   * `GET /v1/book/:symbol` → get orderbook
-* **CLI stub** (future expansion) under `cmd/cli`
-* **Extensive tests**:
-
-  * Unit tests for `TradingService` (with testify & mockery)
-  * Adapter tests using `httptest.Server`
-* **Linting** via `golangci-lint`
 * **Dockerized**, production‑ready static binary
 
 ---
@@ -138,8 +132,6 @@ We’ve included Swagger docs under `docs/swagger.yaml`. After running the serve
 http://localhost:8080/docs/index.html
 ```
 
-
-
 ## 🏗️ Architecture Overview
 
 1. **`internal/domain`**
@@ -167,22 +159,6 @@ http://localhost:8080/docs/index.html
    * DI wiring to assemble the service, adapter, and router
 
 This separation keeps your core business logic **exchange‑agnostic** and makes it trivial to plug in new adapters (e.g. KuCoin, Binance) with minimal code changes.
-
----
-
-## 🤝 Contributing
-
-1. Fork the repo
-2. Create a feature branch: `git checkout -b feat/your-feature`
-3. Write tests, follow Go best‑practices
-4. Run `golangci-lint run` and `go test ./...`
-5. Submit a PR—happy to review!
-
----
-
-## 🎉 License
-
-[MIT](LICENSE) © Your Name
 
 ```
 ```
