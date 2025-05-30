@@ -1,6 +1,3 @@
-Here’s the cleaned‑up README with proper code fences and formatting:
-
-````markdown
 # Trade-Go
 
 A small, pluggable crypto‐trading application in Go, built with a hexagonal (ports & adapters) architecture.  
@@ -8,7 +5,6 @@ It provides both an HTTP API (via Fiber) , and supports multiple exchanges throu
 
 ---
 
-````
 
 ---
 
