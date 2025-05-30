@@ -1,64 +1,53 @@
+````markdown
 # Trade-Go
 
-A small, pluggable crypto‐trading application in Go, built with a hexagonal (ports & adapters) architecture.  
-It provides both an HTTP API (via Fiber) , and supports multiple exchanges through adapters (Bitpin, Wallex, etc.), complete with automatic token refresh, structured logging (Logrus).
+A small, pluggable crypto‑trading application in Go, built with a hexagonal (ports & adapters) architecture.  
+It provides an HTTP API (via Fiber) and supports multiple exchanges through adapters (Bitpin, Wallex, etc.), complete with automatic token refresh and structured logging via Logrus.
 
 ---
 
 ## Features
 
-* **Hexagonal architecture**: clear separation of domain, application, adapters, and transport layers
-* **Multiple exchanges**: Bitpin and Wallex adapters out‑of‑the‑box, easy to add more
-* **Automatic token management**: background refresh + inline refresh within 30s of expiry
-* **Structured JSON logging** with Logrus, injected via a `LoggerPort` interface
-* **HTTP API** (Fiber) exposing:
-
-  * `POST /v1/orders` → create order
-  * `DELETE /v1/orders/:symbol/:id` → cancel order
-  * `GET /v1/balance` → get account balances
-  * `GET /v1/book/:symbol` → get orderbook
-* **Dockerized**, production‑ready static binary
+- **Hexagonal architecture**: clear separation of domain, application, adapters, and transport layers  
+- **Multiple exchanges**: Bitpin and Wallex adapters out‑of‑the‑box, easy to add more  
+- **Automatic token management**: background refresh + inline refresh within 30 s of expiry  
+- **Structured JSON logging** via a `LoggerPort` interface  
+- **HTTP API** (Fiber) exposing:
+  - `POST /v1/orders` → create order  
+  - `DELETE /v1/orders/:symbol/:id` → cancel order  
+  - `GET /v1/balance` → get account balances  
+  - `GET /v1/book/:symbol` → get orderbook  
+- **Dockerized**, production‑ready static binary
 
 ---
 
 ## Prerequisites
 
-* Go **1.22** (as declared in `go.mod`)
-* Git
-* (Optional) Docker & Docker Compose
-* Exchange API credentials for Bitpin or Wallex
+- Go **1.22** (as declared in `go.mod`)  
+- Git  
+- (Optional) Docker & Docker Compose  
+- API credentials for Bitpin or Wallex
 
 ---
 
-## 🛠️ Setup
+## Setup
 
 1. **Clone the repo**
 
    ```bash
    git clone https://github.com/you/Trade-Go.git
    cd Trade-Go
-   ```
+````
 
 2. **Environment**
 
-   Create a `.env` file in the project root:
+   Copy the sample env file and fill in your credentials:
 
-   ```dotenv
-   EXCHANGE=bitpin           # or "wallex"
-   HTTP_PORT=8080
-   LOG_LEVEL=info
-
-   # Bitpin (if using Bitpin adapter)
-   BITPIN_API_KEY=your_key
-   BITPIN_API_SECRET=your_secret
-   BITPIN_BASE_URL=https://api.bitpin.ir
-
-   # Wallex (if using Wallex adapter)
-   WALLEX_API_KEY=your_key
-   WALLEX_BASE_URL=https://api.wallex.ir
+   ```bash
+   cp .env.sample .env
    ```
 
-3. **Fetch modules**
+3. **Fetch dependencies**
 
    ```bash
    go mod download
@@ -66,27 +55,22 @@ It provides both an HTTP API (via Fiber) , and supports multiple exchanges throu
 
 ---
 
-## Build & Run
+## ▶️ Build & Run
 
-### Locally
+### Locally with `go run`
 
 ```bash
-# Build
-go build -ldflags="-s -w" -o trade ./cmd/http
-
-# Run
-./trade
+go run ./cmd/http
 ```
 
-The server will start on `http://localhost:8080` (or `$HTTP_PORT`).
+By default it listens on `:$HTTP_PORT` (8080 if unset).
+
 
 ### Docker
 
 ```bash
-# Build
 docker build -t trade-app .
 
-# Run
 docker run -d \
   --name trade \
   -p 8080:8080 \
@@ -98,39 +82,39 @@ docker run -d \
 
 ## API Documentation
 
-We’ve included Swagger docs under `docs/swagger.yaml`. After running the server, you can serve them with any Swagger UI, or point your browser at:
+Swagger specs live under `docs/`. Once your server is up, point any Swagger UI at:
 
 ```
-http://localhost:8080/docs/index.html
+http://localhost:8080/docs/swagger.yaml
 ```
+
+(or serve `docs/swagger.yaml` through your preferred UI)
+
+---
 
 ## Architecture Overview
 
 1. **`internal/domain`**
 
-   * `ExchangePort` & `LoggerPort` interfaces
+   * `ExchangePort` & `LoggerPort`
    * Domain models (`OrderRequest`, `OrderResponse`, `Balance`, `OrderBook`)
 
 2. **`internal/application`**
 
-   * `TradingService` implements main use‑cases by calling `ExchangePort`
+   * `TradingService` implements business use‑cases
 
 3. **`internal/adapters`**
 
-   * Exchange‑specific logic (HTTP client, JSON mapping, logging)
-   * Bitpin adapter with background token refresh
-   * Wallex adapter with robust parsing of mixed JSON types
+   * Bitpin & Wallex adapters (HTTP, JSON mapping, logging)
 
 4. **`pkg/transport`**
 
-   * Fiber router, request validation, and JSON responses
+   * Fiber router and handlers
 
 5. **`internal/infrastructure`**
 
-   * Configuration loader (`.env`)
-   * DI wiring to assemble the service, adapter, and router
+   * `.env` loader and DI wiring
 
-This separation keeps your core business logic **exchange‑agnostic** and makes it trivial to plug in new adapters (e.g. KuCoin, Binance) with minimal code changes.
+---
 
-```
-```
+
