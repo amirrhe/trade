@@ -5,9 +5,6 @@ It provides both an HTTP API (via Fiber) , and supports multiple exchanges throu
 
 ---
 
-
----
-
 ## Features
 
 * **Hexagonal architecture**: clear separation of domain, application, adapters, and transport layers
