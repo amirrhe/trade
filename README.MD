@@ -19,11 +19,7 @@ This application provides an HTTP API for trading cryptocurrencies, built with a
 - **Structured JSON logging**: Uses a `LoggerPort` interface for logging.
 - **HTTP API**: Provides endpoints for creating, canceling, and retrieving orders and balances.
 - **Dockerized**: Ready for production deployment.
-## Contributing
 
-Contributions are welcome! Please open an issue or submit a pull request.
-
----
 
 ## Prerequisites
 
