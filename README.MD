@@ -2,9 +2,7 @@
 # Trade-Go
 
 A small, pluggable crypto‑trading application in Go, built with a hexagonal (ports & adapters) architecture.  
-It provides an HTTP API (via Fiber) and supports multiple exchanges through adapters (Bitpin, Wallex, etc.), complete with automatic token refresh and structured logging via Logrus.
-
----
+It provides an HTTP API (via Fiber) and supports multiple exchanges through adapters (Bitpin, Wallex, etc.).
 
 ## Features
 
