@@ -1,4 +1,3 @@
-````markdown
 # Trade-Go
 
 A small, pluggable crypto‑trading application in Go, built with a hexagonal (ports & adapters) architecture.  
@@ -53,7 +52,7 @@ It provides an HTTP API (via Fiber) and supports multiple exchanges through adap
 
 ---
 
-## ▶️ Build & Run
+## Build & Run
 
 ### Locally with `go run`
 
