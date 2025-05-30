@@ -1,4 +1,6 @@
-```markdown
+Here’s the cleaned‑up README with proper code fences and formatting:
+
+````markdown
 # Trade-Go
 
 A small, pluggable crypto‐trading application in Go, built with a hexagonal (ports & adapters) architecture.  
@@ -8,8 +10,7 @@ It provides both an HTTP API (via Fiber) and a CLI entrypoint, and supports mult
 
 ## 📂 Project Structure
 
-```
-
+```text
 .
 ├── cmd
 │   └── http
@@ -28,37 +29,38 @@ It provides both an HTTP API (via Fiber) and a CLI entrypoint, and supports mult
 ├── go.mod
 ├── go.sum
 └── Dockerfile
-
 ````
 
 ---
 
 ## 🚀 Features
 
-- **Hexagonal architecture**: clear separation of domain, application, adapters, and transport layers  
-- **Multiple exchanges**: Bitpin and Wallex adapters out‑of‑the‑box, easy to add more  
-- **Automatic token management**: background refresh + inline refresh within 30s of expiry  
-- **Structured JSON logging** with Logrus, injected via a `LoggerPort` interface  
-- **HTTP API** (Fiber) exposing:
-  - `POST /v1/orders` → create order  
-  - `DELETE /v1/orders/:symbol/:id` → cancel order  
-  - `GET /v1/balance` → get account balances  
-  - `GET /v1/book/:symbol` → get orderbook  
-- **CLI stub** (future expansion) under `cmd/cli`  
-- **Extensive tests**:
-  - Unit tests for `TradingService` (with testify & mockery)  
-  - Adapter tests using `httptest.Server`  
-- **Linting** via `golangci-lint`  
-- **Dockerized**, production‑ready static binary
+* **Hexagonal architecture**: clear separation of domain, application, adapters, and transport layers
+* **Multiple exchanges**: Bitpin and Wallex adapters out‑of‑the‑box, easy to add more
+* **Automatic token management**: background refresh + inline refresh within 30s of expiry
+* **Structured JSON logging** with Logrus, injected via a `LoggerPort` interface
+* **HTTP API** (Fiber) exposing:
+
+  * `POST /v1/orders` → create order
+  * `DELETE /v1/orders/:symbol/:id` → cancel order
+  * `GET /v1/balance` → get account balances
+  * `GET /v1/book/:symbol` → get orderbook
+* **CLI stub** (future expansion) under `cmd/cli`
+* **Extensive tests**:
+
+  * Unit tests for `TradingService` (with testify & mockery)
+  * Adapter tests using `httptest.Server`
+* **Linting** via `golangci-lint`
+* **Dockerized**, production‑ready static binary
 
 ---
 
 ## 🎲 Prerequisites
 
-- Go **1.22** (as declared in `go.mod`)  
-- Git  
-- (Optional) Docker & Docker Compose  
-- Exchange API credentials for Bitpin or Wallex  
+* Go **1.22** (as declared in `go.mod`)
+* Git
+* (Optional) Docker & Docker Compose
+* Exchange API credentials for Bitpin or Wallex
 
 ---
 
@@ -69,7 +71,7 @@ It provides both an HTTP API (via Fiber) and a CLI entrypoint, and supports mult
    ```bash
    git clone https://github.com/you/Trade-Go.git
    cd Trade-Go
-````
+   ```
 
 2. **Environment**
 
@@ -130,61 +132,36 @@ docker run -d \
 
 ## 📑 API Documentation
 
-We’ve included Swagger docs under `docs/swagger.yaml`. After running the server, you can serve it with any Swagger UI, or point your browser at:
+We’ve included Swagger docs under `docs/swagger.yaml`. After running the server, you can serve them with any Swagger UI, or point your browser at:
 
 ```
-http://localhost:8080/swagger/index.html
+http://localhost:8080/docs/index.html
 ```
 
----
 
-## 🧪 Tests & Linting
-
-* **Unit tests**:
-
-  ```bash
-  go test ./internal/application -v
-  go test ./internal/adapters/bitpin -v
-  go test ./internal/adapters/wallex -v
-  ```
-
-* **Mock generation** (requires \[mockery]):
-
-  ```bash
-  mockery --dir internal/domain --name ExchangePort --output internal/domain/mocks
-  mockery --dir internal/ports  --name LoggerPort   --output internal/ports/mocks
-  ```
-
-* **Lint**:
-
-  ```bash
-  golangci-lint run ./...
-  ```
-
----
 
 ## 🏗️ Architecture Overview
 
-1. **`internal/domain`**:
+1. **`internal/domain`**
 
    * `ExchangePort` & `LoggerPort` interfaces
    * Domain models (`OrderRequest`, `OrderResponse`, `Balance`, `OrderBook`)
 
-2. **`internal/application`**:
+2. **`internal/application`**
 
    * `TradingService` implements main use‑cases by calling `ExchangePort`
 
-3. **`internal/adapters`**:
+3. **`internal/adapters`**
 
    * Exchange‑specific logic (HTTP client, JSON mapping, logging)
    * Bitpin adapter with background token refresh
    * Wallex adapter with robust parsing of mixed JSON types
 
-4. **`pkg/transport`**:
+4. **`pkg/transport`**
 
    * Fiber router, request validation, and JSON responses
 
-5. **`internal/infrastructure`**:
+5. **`internal/infrastructure`**
 
    * Configuration loader (`.env`)
    * DI wiring to assemble the service, adapter, and router
@@ -193,6 +170,19 @@ This separation keeps your core business logic **exchange‑agnostic** and makes
 
 ---
 
+## 🤝 Contributing
+
+1. Fork the repo
+2. Create a feature branch: `git checkout -b feat/your-feature`
+3. Write tests, follow Go best‑practices
+4. Run `golangci-lint run` and `go test ./...`
+5. Submit a PR—happy to review!
+
+---
+
+## 🎉 License
+
+[MIT](LICENSE) © Your Name
 
 ```
 ```
